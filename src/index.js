@@ -88,41 +88,66 @@ function init() {
     WIDTH = canvas.width;
     HEIGHT = canvas.height;
 
+    // More bars. Try 1024
     analyser.fftSize = 256;
     const bufferLengthAlt = analyser.frequencyBinCount;
-    
+
     // We can use Float32Array instead of Uint8Array if we want higher precision
     // const dataArray = new Float32Array(bufferLength);
-    const dataArrayAlt = new Uint8Array(bufferLengthAlt);
+    const freqDomainAlt = new Uint8Array(bufferLengthAlt);
 
     canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
 
     const drawAlt = function () {
       // Pause animation if muted
-      if (mute.id !== "") return;
+      // if (mute.id !== "") return;
 
       drawVisual = requestAnimationFrame(drawAlt);
 
-      analyser.getByteFrequencyData(dataArrayAlt);
-      console.log(dataArrayAlt);
+      analyser.getByteFrequencyData(freqDomainAlt);
+      // console.log(freqDomainAlt);
+
+      /*
+      // Test for specific freq
+      let frequency = 523.25;   // C5
+
+      let nyquist = audioCtx.sampleRate / 2;
+      // console.log(nyquist);  // 24000
+
+      let index = Math.round(frequency / nyquist * freqDomainAlt.length);
+      // console.log(`index in freqDomainAlt: ${index}`);
+      */
 
       canvasCtx.fillStyle = "rgb(0, 0, 0)";
       canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
-      const barWidth = (WIDTH / bufferLengthAlt) * 2.5;
+      const barWidth = (WIDTH / bufferLengthAlt) * 5;
       let barHeight;
       let x = 0;
 
       for (let i = 0; i < bufferLengthAlt; i++) {
-        barHeight = dataArrayAlt[i];
+        barHeight = freqDomainAlt[i];
 
         canvasCtx.fillStyle = "rgb(" + (barHeight + 100) + ",50,50)";
+
+        /*
+        // Test for specific freq
+
+        if (i === index) {
+          canvasCtx.fillStyle = 'yellow';
+        }
+        */
+
         canvasCtx.fillRect(
           x,
           HEIGHT - barHeight / 2,
           barWidth,
           barHeight / 2
         );
+
+        canvasCtx.font = "1.1rem Arial";
+        canvasCtx.fillStyle = "white";
+        canvasCtx.fillText(barHeight, x, HEIGHT);
 
         x += barWidth + 1;
       }
