@@ -59,7 +59,7 @@ function init() {
 
   const intendedWidth = document.querySelector(".wrapper").clientWidth;
   canvas.setAttribute("width", intendedWidth);
-  
+
   // Main block for doing the audio recording
   if (navigator.mediaDevices.getUserMedia) {
     console.log("getUserMedia supported.");
@@ -90,8 +90,7 @@ function init() {
 
     analyser.fftSize = 256;
     const bufferLengthAlt = analyser.frequencyBinCount;
-    console.log(bufferLengthAlt);
-
+    
     // We can use Float32Array instead of Uint8Array if we want higher precision
     // const dataArray = new Float32Array(bufferLength);
     const dataArrayAlt = new Uint8Array(bufferLengthAlt);
@@ -99,9 +98,13 @@ function init() {
     canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
 
     const drawAlt = function () {
+      // Pause animation if muted
+      if (mute.id !== "") return;
+
       drawVisual = requestAnimationFrame(drawAlt);
 
       analyser.getByteFrequencyData(dataArrayAlt);
+      console.log(dataArrayAlt);
 
       canvasCtx.fillStyle = "rgb(0, 0, 0)";
       canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
@@ -139,6 +142,8 @@ function init() {
       gainNode.gain.value = 1;
       mute.id = "";
       mute.innerHTML = "Mute";
+
+      visualize();
     }
   }
 }
